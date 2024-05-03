@@ -1,10 +1,10 @@
 //Variable for resource names module
 environment             = "sandbox"
-environment_number      = "00"
+environment_number      = "000"
 resource_number         = "000"
-logical_product_family  = "fdc"
+logical_product_family  = "launch"
 logical_product_service = "network"
-location                = "usgovvirginia"
+location                = "eastus"
 resource_names_map = {
 
   resource_group = {
@@ -28,8 +28,6 @@ route_tables_ids         = {}
 subnet_delegation        = {}
 subnet_service_endpoints = {}
 vnet_tags                = {}
-tracing_tags_enabled     = false
-tracing_tags_prefix      = ""
 use_for_each             = true
 subnet_private_endpoint_network_policies_enabled = {
   AppGwSbnt = false

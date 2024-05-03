@@ -1,4 +1,4 @@
-module fdc-devops.dc.state.fl.us/DefaultCollection/TRP/_git/tf-azurerm-module_reference-virtual_network
+module github.com/launchbynttdata/tf-azurerm-module_reference-virtual_network
 
 go 1.21
 

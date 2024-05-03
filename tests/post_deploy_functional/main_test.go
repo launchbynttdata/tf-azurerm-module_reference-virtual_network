@@ -15,7 +15,7 @@ package test
 import (
 	"testing"
 
-	testimpl "fdc-devops.dc.state.fl.us/DefaultCollection/TRP/_git/tf-azurerm-module_reference-virtual_network/tests/testimpl"
+	testimpl "github.com/launchbynttdata/tf-azurerm-module_reference-virtual_network/tests/testimpl"
 	"github.com/launchbynttdata/lcaf-component-terratest/lib"
 	"github.com/launchbynttdata/lcaf-component-terratest/types"
 )
