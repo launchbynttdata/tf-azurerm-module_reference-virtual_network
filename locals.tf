@@ -1,9 +1,6 @@
 locals {
   default_tags = {
-    "Business Unit" = "OIT",
-    "Created By"    = "FDC Platform Automation",
-    "Owner"         = "Infrastructure",
-    "Cost Center"   = "OIT"
+    "provisioner" = "terraform"
   }
   vnet_tags           = merge(var.vnet_tags, local.default_tags)
   resource_group_tags = merge(var.resource_group_tags, local.default_tags)
