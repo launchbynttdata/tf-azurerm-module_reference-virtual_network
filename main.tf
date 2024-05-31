@@ -37,9 +37,8 @@ module "resource_group" {
 }
 
 module "network" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git?ref=feature!/consolidate-subnet-logic"
-  # source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
-  # version = "~> 3.0"
+  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  version = "~> 3.0"
 
   resource_group_name  = module.resource_group.name
   vnet_location        = var.location
