@@ -37,25 +37,39 @@ module "resource_group" {
 }
 
 module "network" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
-  version = "~> 2.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git?ref=feature!/consolidate-subnet-logic"
+  # source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  # version = "~> 3.0"
 
-  resource_group_name                              = module.resource_group.name
-  vnet_location                                    = var.location
-  vnet_name                                        = local.virtual_network_name
-  address_space                                    = var.address_space
-  subnet_names                                     = var.subnet_names
-  subnet_prefixes                                  = var.subnet_prefixes
-  bgp_community                                    = var.bgp_community
-  ddos_protection_plan                             = var.ddos_protection_plan
-  dns_servers                                      = var.dns_servers
-  nsg_ids                                          = var.nsg_ids
-  route_tables_ids                                 = var.route_tables_ids
-  subnet_delegation                                = var.subnet_delegation
-  subnet_service_endpoints                         = var.subnet_service_endpoints
-  subnet_private_endpoint_network_policies_enabled = var.subnet_private_endpoint_network_policies_enabled
-  tags                                             = local.vnet_tags
-  use_for_each                                     = var.use_for_each
+  resource_group_name  = module.resource_group.name
+  vnet_location        = var.location
+  vnet_name            = local.virtual_network_name
+  address_space        = var.address_space
+  bgp_community        = var.bgp_community
+  ddos_protection_plan = var.ddos_protection_plan
+  dns_servers          = var.dns_servers
+  subnets              = var.subnets
+  tags                 = local.vnet_tags
 
   depends_on = [module.resource_group]
+}
+
+module "route_tables" {
+  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm"
+  version = "~> 1.0"
+
+  for_each = local.transformed_route_tables
+
+  name                          = each.value.name
+  location                      = var.location
+  disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
+  resource_group_name           = each.value.resource_group_name
+  tags                          = each.value.tags
+}
+
+module "routes" {
+  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route/azurerm"
+  version = "~> 1.0"
+
+  routes = local.transformed_routes
 }
