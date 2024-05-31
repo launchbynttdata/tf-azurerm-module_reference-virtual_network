@@ -49,47 +49,53 @@ variable "dns_servers" {
   description = "The DNS servers to be used with vNet."
 }
 
-variable "nsg_ids" {
-  type = map(string)
-  default = {
+variable "subnets" {
+  description = "A mapping of subnet names to their configurations."
+  type = map(object({
+    prefix = string
+    delegation = optional(object({
+      name    = string
+      actions = list(string)
+    }), null)
+    service_endpoints                             = optional(list(string), []),
+    private_endpoint_network_policies_enabled     = optional(bool, false)
+    private_link_service_network_policies_enabled = optional(bool, false)
+    network_security_group_id                     = optional(string, null)
+    route_table_id                                = optional(string, null)
+    route_table_alias                             = optional(string, null)
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for subnet_name, subnet in var.subnets : subnet.route_table_id == null || subnet.route_table_alias == null ? true : subnet.route_table_id == null && subnet.route_table_alias == null ? true : false])
+    error_message = "Subnets may define either a route_table_id or a route_table_alias, but not both."
   }
-  description = "A map of subnet name to Network Security Group IDs"
 }
 
-variable "route_tables_ids" {
-  type        = map(string)
-  default     = {}
-  description = "A map of subnet name to Route table ids"
+variable "route_tables" {
+  description = "A mapping of route table aliases to route table configuration."
+  type = map(object({
+    name                          = string
+    disable_bgp_route_propagation = optional(bool, false)
+    extra_tags                    = optional(map(string), {})
+  }))
+  default = {}
 }
 
-variable "subnet_delegation" {
-  type        = map(map(any))
-  default     = {}
-  description = "A map of subnet name to delegation block on the subnet"
-}
+variable "routes" {
+  description = "A mapping of routes to create."
+  type = map(object({
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = optional(string, null)
+  }))
+  default = {}
 
-variable "subnet_private_endpoint_network_policies_enabled" {
-  type        = map(string)
-  default     = {}
-  description = "A map of subnet name to enable/disable private link service network policies on the subnet. All subnets being created as part of this module, should be part of this map."
+  validation {
+    condition     = alltrue([for route_name, route_definition in var.routes : contains(["VirtualNetworkGateway", "VnetLocal", "Internet", "VirtualAppliance", "None"], route_definition.next_hop_type)])
+    error_message = "next_hop_type must contain 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', or 'None'."
+  }
 }
-
-variable "subnet_names" {
-  type        = list(string)
-  description = "A list of public subnets inside the vNet."
-}
-
-variable "subnet_prefixes" {
-  type        = list(string)
-  description = "The address prefix to use for the subnet."
-}
-
-variable "subnet_service_endpoints" {
-  type        = map(any)
-  default     = {}
-  description = "A map of subnet name to service endpoints to add to the subnet."
-}
-
 
 variable "vnet_tags" {
   type    = map(string)
