@@ -63,3 +63,7 @@ output "transformed_routes" {
 output "route_tables_map" {
   value = module.route_tables
 }
+
+output "subnet_route_associations" {
+  value = module.network.subnet_route_associations
+}

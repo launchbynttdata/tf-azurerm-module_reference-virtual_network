@@ -37,8 +37,9 @@ module "resource_group" {
 }
 
 module "network" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
-  version = "~> 3.0"
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git?ref=fix/route-table-association"
+  # source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  # version = "~> 3.0"
 
   resource_group_name  = module.resource_group.name
   vnet_location        = var.location
@@ -47,11 +48,14 @@ module "network" {
   bgp_community        = var.bgp_community
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
-  subnets              = local.transformed_subnets # var.subnets
-  tags                 = local.vnet_tags
+  subnets              = var.subnets
+  # subnets              = local.transformed_subnets
+  tags = local.vnet_tags
 
   depends_on = [module.resource_group, module.route_tables]
 }
+
+
 
 module "route_tables" {
   source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm"

@@ -13,3 +13,6 @@
 output "transformed_routes" {
   value = module.network.transformed_routes
 }
+output "subnet_route_associations" {
+  value = module.network.subnet_route_associations
+}

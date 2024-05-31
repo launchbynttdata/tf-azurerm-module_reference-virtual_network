@@ -49,4 +49,5 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_transformed_routes"></a> [transformed\_routes](#output\_transformed\_routes) | n/a |
+| <a name="output_subnet_route_associations"></a> [subnet\_route\_associations](#output\_subnet\_route\_associations) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

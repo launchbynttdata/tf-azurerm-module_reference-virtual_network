@@ -121,7 +121,7 @@ No providers.
 |------|--------|---------|
 | <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | d2lqlh14iel5k2.cloudfront.net/module_library/resource_name/launch | ~> 1.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | d2lqlh14iel5k2.cloudfront.net/module_primitive/resource_group/azurerm | ~> 1.0 |
-| <a name="module_network"></a> [network](#module\_network) | d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm | ~> 3.0 |
+| <a name="module_network"></a> [network](#module\_network) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git | fix/route-table-association |
 | <a name="module_route_tables"></a> [route\_tables](#module\_route\_tables) | d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm | ~> 1.0 |
 | <a name="module_routes"></a> [routes](#module\_routes) | d2lqlh14iel5k2.cloudfront.net/module_primitive/route/azurerm | ~> 1.0 |
 
@@ -165,4 +165,5 @@ No resources.
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | resource group name |
 | <a name="output_transformed_routes"></a> [transformed\_routes](#output\_transformed\_routes) | n/a |
 | <a name="output_route_tables_map"></a> [route\_tables\_map](#output\_route\_tables\_map) | n/a |
+| <a name="output_subnet_route_associations"></a> [subnet\_route\_associations](#output\_subnet\_route\_associations) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

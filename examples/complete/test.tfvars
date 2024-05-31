@@ -1,6 +1,5 @@
 location = "eastus"
 
-//Variables for networking module
 address_space = ["172.16.0.0/16"]
 
 subnets = {
