@@ -15,4 +15,13 @@ locals {
       tags                = merge(local.default_tags, route_table_definition.extra_tags)
     })
   }
+
+  transformed_routes = {
+    for route_alias, route_definition in var.routes :
+    route_alias => merge(route_definition, {
+      resource_group_name = local.resource_group_name
+      route_table_name    = module.route_tables[route_definition.route_table_alias].name
+      tags                = merge(local.default_tags, route_definition.extra_tags)
+    })
+  }
 }
