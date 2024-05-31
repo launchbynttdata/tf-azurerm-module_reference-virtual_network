@@ -47,10 +47,10 @@ module "network" {
   bgp_community        = var.bgp_community
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
-  subnets              = var.subnets
+  subnets              = local.transformed_subnets # var.subnets
   tags                 = local.vnet_tags
 
-  depends_on = [module.resource_group]
+  depends_on = [module.resource_group, module.route_tables]
 }
 
 module "route_tables" {
@@ -64,6 +64,8 @@ module "route_tables" {
   disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
   resource_group_name           = each.value.resource_group_name
   tags                          = each.value.tags
+
+  depends_on = [module.resource_group]
 }
 
 module "routes" {
@@ -71,4 +73,6 @@ module "routes" {
   version = "~> 1.0"
 
   routes = local.transformed_routes
+
+  depends_on = [module.resource_group]
 }

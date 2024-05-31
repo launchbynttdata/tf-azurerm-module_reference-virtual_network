@@ -55,3 +55,11 @@ output "resource_group_name" {
   description = "resource group name"
   value       = module.resource_group.name
 }
+
+output "transformed_routes" {
+  value = local.transformed_routes
+}
+
+output "route_tables_map" {
+  value = module.route_tables
+}

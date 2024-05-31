@@ -8,6 +8,13 @@ locals {
   resource_group_name  = module.resource_names["resource_group"].standard
   virtual_network_name = module.resource_names["virtual_network"].standard
 
+  transformed_subnets = {
+    for subnet_alias, subnet_definition in var.subnets :
+    subnet_alias => merge(subnet_definition, {
+      route_table_id = subnet_definition.route_table_id != null ? subnet_definition.route_table_id : subnet_definition.route_table_alias != null ? module.route_tables[subnet_definition.route_table_alias].id : null
+    })
+  }
+
   transformed_route_tables = {
     for route_table_alias, route_table_definition in var.route_tables :
     route_table_alias => merge(route_table_definition, {

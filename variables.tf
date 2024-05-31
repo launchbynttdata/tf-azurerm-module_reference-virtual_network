@@ -10,11 +10,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-variable "use_for_each" {
-  type        = bool
-  description = "Use `for_each` instead of `count` to create multiple resource instances."
-  nullable    = false
-}
 
 variable "location" {
   type        = string
@@ -85,6 +80,7 @@ variable "route_tables" {
 variable "routes" {
   description = "A mapping of routes to create."
   type = map(object({
+    name                   = string
     route_table_alias      = string
     address_prefix         = string
     next_hop_type          = string

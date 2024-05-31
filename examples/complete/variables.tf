@@ -11,12 +11,6 @@
 // limitations under the License.
 
 
-variable "use_for_each" {
-  type        = bool
-  description = "Use `for_each` instead of `count` to create multiple resource instances."
-  nullable    = false
-}
-
 variable "location" {
   type        = string
   description = "The location of the vnet and resource group to create."
@@ -25,7 +19,6 @@ variable "location" {
 
 variable "address_space" {
   type        = list(string)
-  default     = ["172.16.0.0/16"]
   description = "The address space that is used by the virtual network."
 }
 
@@ -51,46 +44,54 @@ variable "dns_servers" {
   description = "The DNS servers to be used with vNet."
 }
 
-variable "nsg_ids" {
-  type = map(string)
-  default = {
+variable "subnets" {
+  description = "A mapping of subnet names to their configurations."
+  type = map(object({
+    prefix = string
+    delegation = optional(object({
+      name    = string
+      actions = list(string)
+    }), null)
+    service_endpoints                             = optional(list(string), []),
+    private_endpoint_network_policies_enabled     = optional(bool, false)
+    private_link_service_network_policies_enabled = optional(bool, false)
+    network_security_group_id                     = optional(string, null)
+    route_table_id                                = optional(string, null)
+    route_table_alias                             = optional(string, null)
+  }))
+  default = {}
+
+  validation {
+    condition     = alltrue([for subnet_name, subnet in var.subnets : subnet.route_table_id == null || subnet.route_table_alias == null ? true : subnet.route_table_id == null && subnet.route_table_alias == null ? true : false])
+    error_message = "Subnets may define either a route_table_id or a route_table_alias, but not both."
   }
-  description = "A map of subnet name to Network Security Group IDs"
 }
 
-variable "route_tables_ids" {
-  type        = map(string)
-  default     = {}
-  description = "A map of subnet name to Route table ids"
+variable "route_tables" {
+  description = "A mapping of route table aliases to route table configuration."
+  type = map(object({
+    name                          = string
+    disable_bgp_route_propagation = optional(bool, false)
+    extra_tags                    = optional(map(string), {})
+  }))
+  default = {}
 }
 
-variable "subnet_delegation" {
-  type        = map(map(any))
-  default     = {}
-  description = "A map of subnet name to delegation block on the subnet"
-}
+variable "routes" {
+  description = "A mapping of routes to create."
+  type = map(object({
+    name                   = string
+    route_table_alias      = string
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = optional(string, null)
+  }))
+  default = {}
 
-variable "subnet_private_endpoint_network_policies_enabled" {
-  type        = map(string)
-  default     = {}
-  description = "A map of subnet name to enable/disable private link service network policies on the subnet."
-}
-
-
-variable "subnet_names" {
-  type        = list(string)
-  description = "A list of public subnets inside the vNet."
-}
-
-variable "subnet_prefixes" {
-  type        = list(string)
-  description = "The address prefix to use for the subnet."
-}
-
-variable "subnet_service_endpoints" {
-  type        = map(any)
-  default     = {}
-  description = "A map of subnet name to service endpoints to add to the subnet."
+  validation {
+    condition     = alltrue([for route_name, route_definition in var.routes : contains(["VirtualNetworkGateway", "VnetLocal", "Internet", "VirtualAppliance", "None"], route_definition.next_hop_type)])
+    error_message = "next_hop_type must contain 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', or 'None'."
+  }
 }
 
 variable "vnet_tags" {
@@ -107,11 +108,19 @@ variable "resource_names_map" {
     name       = string
     max_length = optional(number, 60)
   }))
-
+  default = {
+    resource_group = {
+      name = "rg"
+    }
+    virtual_network = {
+      name = "vnet"
+    }
+  }
 }
 variable "environment" {
   description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
   type        = string
+  default     = "sandbox"
 }
 
 variable "environment_number" {
@@ -133,6 +142,7 @@ variable "logical_product_family" {
     Example: org_name, department_name.
   EOF
   nullable    = false
+  default     = "launch"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
@@ -148,6 +158,7 @@ variable "logical_product_service" {
     For example, backend, frontend, middleware etc.
   EOF
   nullable    = false
+  default     = "vnet"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_service))

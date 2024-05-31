@@ -13,20 +13,16 @@
 module "network" {
   source = "../.."
 
-  use_for_each                                     = var.use_for_each
-  location                                         = var.location
-  address_space                                    = var.address_space
-  bgp_community                                    = var.bgp_community
-  ddos_protection_plan                             = var.ddos_protection_plan
-  dns_servers                                      = var.dns_servers
-  nsg_ids                                          = var.nsg_ids
-  route_tables_ids                                 = var.route_tables_ids
-  subnet_delegation                                = var.subnet_delegation
-  subnet_private_endpoint_network_policies_enabled = var.subnet_private_endpoint_network_policies_enabled
-  subnet_names                                     = var.subnet_names
-  subnet_prefixes                                  = var.subnet_prefixes
-  subnet_service_endpoints                         = var.subnet_service_endpoints
-  vnet_tags                                        = var.vnet_tags
+  location             = var.location
+  address_space        = var.address_space
+  bgp_community        = var.bgp_community
+  ddos_protection_plan = var.ddos_protection_plan
+  dns_servers          = var.dns_servers
+  subnets              = var.subnets
+  vnet_tags            = var.vnet_tags
+
+  routes       = var.routes
+  route_tables = var.route_tables
 
   resource_names_map      = var.resource_names_map
   environment             = var.environment
