@@ -33,7 +33,7 @@ module "resource_group" {
 
   name     = local.resource_group_name
   location = var.location
-  tags     = local.resource_group_tags
+  tags     = local.tags
 }
 
 module "network" {
@@ -50,7 +50,7 @@ module "network" {
   dns_servers          = var.dns_servers
   subnets              = var.subnets
   # subnets              = local.transformed_subnets
-  tags = local.vnet_tags
+  tags = local.tags
 
   depends_on = [module.resource_group, module.route_tables]
 }
@@ -67,7 +67,7 @@ module "route_tables" {
   location                      = var.location
   disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
   resource_group_name           = each.value.resource_group_name
-  tags                          = each.value.tags
+  tags                          = merge(local.tags, each.value.extra_tags)
 
   depends_on = [module.resource_group]
 }

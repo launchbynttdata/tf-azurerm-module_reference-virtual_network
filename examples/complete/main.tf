@@ -19,7 +19,6 @@ module "network" {
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
   subnets              = var.subnets
-  vnet_tags            = var.vnet_tags
 
   routes       = var.routes
   route_tables = var.route_tables
@@ -31,5 +30,5 @@ module "network" {
   logical_product_family  = var.logical_product_family
   logical_product_service = var.logical_product_service
 
-  resource_group_tags = var.resource_group_tags
+  tags = var.tags
 }

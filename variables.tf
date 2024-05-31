@@ -94,9 +94,10 @@ variable "routes" {
   }
 }
 
-variable "vnet_tags" {
-  type    = map(string)
-  default = {}
+variable "tags" {
+  type        = map(string)
+  description = "Tags to be applied to all resources that are created by this module."
+  default     = {}
 }
 
 //variables required by resource names module
@@ -161,10 +162,4 @@ variable "logical_product_service" {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_service))
     error_message = "The variable must contain letters, numbers, -, _, and .."
   }
-}
-
-//variables required by resource groups module
-variable "resource_group_tags" {
-  type    = map(string)
-  default = {}
 }
