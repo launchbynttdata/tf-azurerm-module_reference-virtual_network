@@ -85,6 +85,7 @@ variable "route_tables" {
 variable "routes" {
   description = "A mapping of routes to create."
   type = map(object({
+    route_table_alias      = string
     address_prefix         = string
     next_hop_type          = string
     next_hop_in_ip_address = optional(string, null)
