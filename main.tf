@@ -48,9 +48,8 @@ module "network" {
   bgp_community        = var.bgp_community
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
-  subnets              = var.subnets
-  # subnets              = local.transformed_subnets
-  tags = local.tags
+  subnets              = local.transformed_subnets
+  tags                 = local.tags
 
   depends_on = [module.resource_group, module.route_tables]
 }
