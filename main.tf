@@ -37,9 +37,8 @@ module "resource_group" {
 }
 
 module "network" {
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network.git?ref=fix/route-table-association"
-  # source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
-  # version = "~> 3.0"
+  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  version = "~> 3.0"
 
   resource_group_name  = module.resource_group.name
   vnet_location        = var.location
@@ -53,8 +52,6 @@ module "network" {
 
   depends_on = [module.resource_group, module.route_tables]
 }
-
-
 
 module "route_tables" {
   source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm"
