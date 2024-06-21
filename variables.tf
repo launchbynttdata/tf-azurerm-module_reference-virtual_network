@@ -62,7 +62,7 @@ variable "subnets" {
   default = {}
 
   validation {
-    condition     = alltrue([for subnet_name, subnet in var.subnets : subnet.route_table_id == null || subnet.route_table_alias == null ? true : subnet.route_table_id == null && subnet.route_table_alias == null ? true : false])
+    condition     = alltrue([for subnet_name, subnet in var.subnets : !(subnet.route_table_id != null && subnet.route_table_alias != null)])
     error_message = "Subnets may define either a route_table_id or a route_table_alias, but not both."
   }
 }
