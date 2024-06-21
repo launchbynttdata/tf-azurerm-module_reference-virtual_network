@@ -1,34 +1,40 @@
-//Variable for resource names module
-environment             = "sandbox"
-environment_number      = "000"
-resource_number         = "000"
-logical_product_family  = "launch"
-logical_product_service = "network"
-location                = "eastus"
-resource_names_map = {
+location = "eastus"
 
-  resource_group = {
-    name       = "rg"
-    max_length = 80
+address_space = ["172.16.0.0/16"]
+
+subnets = {
+  ExampleSubnet = {
+    prefix = "172.16.0.0/24"
   }
-  virtual_network = {
-    name       = "vnet"
-    max_length = 80
+  ExampleSubnetWithRoutingTable = {
+    prefix            = "172.16.1.0/24"
+    route_table_alias = "ExampleRouteTable"
+  }
+  ExampleSubnetWithSameRoutingTable = {
+    prefix            = "172.16.2.0/24"
+    route_table_alias = "ExampleRouteTable"
   }
 }
-//Variables for networking module
-address_space            = ["172.16.0.0/16"]
-subnet_names             = ["AppGwSbnt"]
-subnet_prefixes          = ["172.16.0.0/24"]
-bgp_community            = null
-ddos_protection_plan     = null
-dns_servers              = []
-nsg_ids                  = {}
-route_tables_ids         = {}
-subnet_delegation        = {}
-subnet_service_endpoints = {}
-vnet_tags                = {}
-use_for_each             = true
-subnet_private_endpoint_network_policies_enabled = {
-  AppGwSbnt = false
+
+route_tables = {
+  ExampleRouteTable = {
+    name = "launch-vnet-example-route-table"
+  }
+}
+
+routes = {
+  ExampleApplianceRoute = {
+    name                   = "launch-vnet-example-appliance-route"
+    route_table_alias      = "ExampleRouteTable"
+    address_prefix         = "0.0.0.0/0"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "10.0.0.1"
+  }
+  ExampleMoreSpecificRoute = {
+    name                   = "launch-vnet-more-specific-appliance-route"
+    route_table_alias      = "ExampleRouteTable"
+    address_prefix         = "10.0.0.0/24"
+    next_hop_type          = "VirtualAppliance"
+    next_hop_in_ip_address = "10.0.0.1"
+  }
 }

@@ -36,17 +36,16 @@ output "vnet_name" {
   value       = module.network.vnet_name
 }
 
-output "vnet_subnets" {
+output "subnet_map" {
   description = "The ids of subnets created inside the newly created vNet"
-  value       = module.network.vnet_subnets
+  value       = module.network.subnet_map
 }
 
-output "vnet_subnets_name_id" {
+output "subnet_name_id_map" {
   description = "Can be queried subnet-id by subnet name by using lookup(module.vnet.vnet_subnets_name_id, subnet1)"
-  value       = module.network.vnet_subnets_name_id
+  value       = module.network.subnet_name_id_map
 }
 
-//Outputs from network module
 output "resource_group_id" {
   description = "resource group id"
   value       = module.resource_group.id
@@ -55,4 +54,16 @@ output "resource_group_id" {
 output "resource_group_name" {
   description = "resource group name"
   value       = module.resource_group.name
+}
+
+output "transformed_routes" {
+  value = local.transformed_routes
+}
+
+output "route_tables_map" {
+  value = module.route_tables
+}
+
+output "subnet_route_associations" {
+  value = module.network.subnet_route_associations
 }

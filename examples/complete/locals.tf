@@ -10,4 +10,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 locals {
+  default_tags = {
+    "provisioner" = "terraform"
+  }
+
+  tags = merge(local.default_tags, var.tags)
 }

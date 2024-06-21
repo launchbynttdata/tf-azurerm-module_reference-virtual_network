@@ -9,3 +9,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+output "transformed_routes" {
+  value = module.network.transformed_routes
+}
+output "subnet_route_associations" {
+  value = module.network.subnet_route_associations
+}
