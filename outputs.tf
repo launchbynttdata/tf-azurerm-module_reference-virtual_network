@@ -38,12 +38,12 @@ output "vnet_name" {
 
 output "subnet_map" {
   description = "The ids of subnets created inside the newly created vNet"
-  value       = module.network.subnet_map
+  value       = { for key, value in module.subnets : key => value.subnet }
 }
 
 output "subnet_name_id_map" {
   description = "Can be queried subnet-id by subnet name by using lookup(module.vnet.vnet_subnets_name_id, subnet1)"
-  value       = module.network.subnet_name_id_map
+  value       = { for key, value in module.subnets : key => value.id }
 }
 
 output "resource_group_id" {
