@@ -10,7 +10,8 @@ locals {
   transformed_subnets = {
     for subnet_alias, subnet_definition in var.subnets :
     subnet_alias => merge(subnet_definition, {
-      route_table_id = subnet_definition.route_table_id != null ? subnet_definition.route_table_id : subnet_definition.route_table_alias != null ? module.route_tables[subnet_definition.route_table_alias].id : null
+      route_table_name                  = subnet_definition.route_table_alias != null ? module.route_tables[subnet_definition.route_table_alias].name : null
+      private_endpoint_network_policies = subnet_definition.private_endpoint_network_policies != null ? subnet_definition.private_endpoint_network_policies : subnet_definition.private_endpoint_network_policies_enabled ? "Enabled" : "Disabled"
     })
   }
 

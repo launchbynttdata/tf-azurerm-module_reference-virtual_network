@@ -11,7 +11,7 @@
 // limitations under the License.
 
 module "resource_names" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_library/resource_name/launch"
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
   version = "~> 1.0"
 
   for_each = var.resource_names_map
@@ -28,7 +28,7 @@ module "resource_names" {
 }
 
 module "resource_group" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/resource_group/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
   version = "~> 1.0"
 
   name     = local.resource_group_name
@@ -37,7 +37,7 @@ module "resource_group" {
 }
 
 module "network" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/virtual_network/azurerm"
   version = "~> 3.0"
 
   resource_group_name  = module.resource_group.name
@@ -47,14 +47,37 @@ module "network" {
   bgp_community        = var.bgp_community
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
-  subnets              = local.transformed_subnets
   tags                 = local.tags
 
   depends_on = [module.resource_group, module.route_tables]
 }
 
+module "subnets" {
+  // todo: change to launch registry URL after merge
+  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network_subnet?ref=feature!/initial-implementation"
+
+  for_each = local.transformed_subnets
+
+  name = each.key
+
+  resource_group_name  = module.resource_group.name
+  virtual_network_name = module.network.vnet_name
+
+  address_prefix                                = each.value.prefix
+  delegations                                   = each.value.delegation
+  private_endpoint_network_policies             = each.value.private_endpoint_network_policies
+  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
+  service_endpoints                             = each.value.service_endpoints
+
+  network_security_group_id = each.value.network_security_group_id
+  route_table_id            = each.value.route_table_id
+  route_table_name          = each.value.route_table_name
+
+  depends_on = [module.network]
+}
+
 module "route_tables" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm"
   version = "~> 1.0"
 
   for_each = local.transformed_route_tables
@@ -69,7 +92,7 @@ module "route_tables" {
 }
 
 module "routes" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route/azurerm"
   version = "~> 1.0"
 
   routes = local.transformed_routes
