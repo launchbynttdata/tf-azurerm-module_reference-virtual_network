@@ -11,7 +11,7 @@
 // limitations under the License.
 
 module "resource_names" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_library/resource_name/launch"
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
   version = "~> 1.0"
 
   for_each = var.resource_names_map
@@ -28,7 +28,7 @@ module "resource_names" {
 }
 
 module "resource_group" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/resource_group/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
   version = "~> 1.0"
 
   name     = local.resource_group_name
@@ -37,7 +37,7 @@ module "resource_group" {
 }
 
 module "network" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/virtual_network/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/virtual_network/azurerm"
   version = "~> 3.0"
 
   resource_group_name  = module.resource_group.name
@@ -54,7 +54,7 @@ module "network" {
 }
 
 module "route_tables" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route_table/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm"
   version = "~> 1.0"
 
   for_each = local.transformed_route_tables
@@ -69,7 +69,7 @@ module "route_tables" {
 }
 
 module "routes" {
-  source  = "d2lqlh14iel5k2.cloudfront.net/module_primitive/route/azurerm"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/route/azurerm"
   version = "~> 1.0"
 
   routes = local.transformed_routes
