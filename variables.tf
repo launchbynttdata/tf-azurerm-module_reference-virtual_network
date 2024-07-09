@@ -49,8 +49,8 @@ variable "subnets" {
   type = map(object({
     prefix = string
     delegation = optional(map(object({
-      name    = string
-      actions = list(string)
+      service_name    = string
+      service_actions = list(string)
     })), {})
     service_endpoints                             = optional(list(string), []),
     private_endpoint_network_policies             = optional(string, null)
