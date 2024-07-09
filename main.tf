@@ -53,8 +53,8 @@ module "network" {
 }
 
 module "subnets" {
-  // todo: change to launch registry URL after merge
-  source = "git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network_subnet?ref=feature!/initial-implementation"
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/virtual_network_subnet/azurerm"
+  version = "~> 1.0"
 
   for_each = local.transformed_subnets
 

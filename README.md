@@ -122,7 +122,7 @@ No providers.
 | <a name="module_resource_names"></a> [resource\_names](#module\_resource\_names) | terraform.registry.launch.nttdata.com/module_library/resource_name/launch | ~> 1.0 |
 | <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm | ~> 1.0 |
 | <a name="module_network"></a> [network](#module\_network) | terraform.registry.launch.nttdata.com/module_primitive/virtual_network/azurerm | ~> 3.0 |
-| <a name="module_subnets"></a> [subnets](#module\_subnets) | git::https://github.com/launchbynttdata/tf-azurerm-module_primitive-virtual_network_subnet | feature!/initial-implementation |
+| <a name="module_subnets"></a> [subnets](#module\_subnets) | terraform.registry.launch.nttdata.com/module_primitive/virtual_network_subnet/azurerm | ~> 1.0 |
 | <a name="module_route_tables"></a> [route\_tables](#module\_route\_tables) | terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm | ~> 1.0 |
 | <a name="module_routes"></a> [routes](#module\_routes) | terraform.registry.launch.nttdata.com/module_primitive/route/azurerm | ~> 1.0 |
 
