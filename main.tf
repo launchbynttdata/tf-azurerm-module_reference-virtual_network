@@ -47,10 +47,33 @@ module "network" {
   bgp_community        = var.bgp_community
   ddos_protection_plan = var.ddos_protection_plan
   dns_servers          = var.dns_servers
-  subnets              = local.transformed_subnets
   tags                 = local.tags
 
   depends_on = [module.resource_group, module.route_tables]
+}
+
+module "subnets" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/virtual_network_subnet/azurerm"
+  version = "~> 1.0"
+
+  for_each = local.transformed_subnets
+
+  name = each.key
+
+  resource_group_name  = module.resource_group.name
+  virtual_network_name = module.network.vnet_name
+
+  address_prefix                                = each.value.prefix
+  delegations                                   = each.value.delegation
+  private_endpoint_network_policies             = each.value.private_endpoint_network_policies
+  private_link_service_network_policies_enabled = each.value.private_link_service_network_policies_enabled
+  service_endpoints                             = each.value.service_endpoints
+
+  network_security_group_id = each.value.network_security_group_id
+  route_table_id            = each.value.route_table_id
+  route_table_name          = each.value.route_table_name
+
+  depends_on = [module.network]
 }
 
 module "route_tables" {

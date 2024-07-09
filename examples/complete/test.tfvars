@@ -14,6 +14,15 @@ subnets = {
     prefix            = "172.16.2.0/24"
     route_table_alias = "ExampleRouteTable"
   }
+  ExampleSubnetWithDelegation = {
+    prefix = "172.16.3.0/24"
+    delegation = {
+      dns-resolver = {
+        service_name    = "Microsoft.Network/dnsResolvers"
+        service_actions = ["Microsoft.Network/virtualNetworks/read"]
+      }
+    }
+  }
 }
 
 route_tables = {
