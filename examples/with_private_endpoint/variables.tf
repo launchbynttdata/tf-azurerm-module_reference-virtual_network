@@ -51,9 +51,8 @@ variable "subnets" {
     delegation = optional(map(object({
       service_name    = string
       service_actions = list(string)
-    })), {})
+    })), null)
     service_endpoints                             = optional(list(string), []),
-    private_endpoint_network_policies             = optional(string, null)
     private_endpoint_network_policies_enabled     = optional(bool, false)
     private_link_service_network_policies_enabled = optional(bool, false)
     network_security_group_id                     = optional(string, null)
@@ -65,25 +64,6 @@ variable "subnets" {
   validation {
     condition     = alltrue([for subnet_name, subnet in var.subnets : !(subnet.route_table_id != null && subnet.route_table_alias != null)])
     error_message = "Subnets may define either a route_table_id or a route_table_alias, but not both."
-  }
-}
-
-variable "private_endpoint_resource_names_map" {
-  description = "A map of key to resource_name that will be used to generate private endpoint resource names"
-  type = map(object({
-    name       = string
-    max_length = optional(number, 60)
-  }))
-
-  default = {
-    private_endpoint = {
-      name       = "pe"
-      max_length = 80
-    }
-    private_service_connection = {
-      name       = "psc"
-      max_length = 80
-    }
   }
 }
 
@@ -137,9 +117,10 @@ variable "routes" {
 
 variable "tags" {
   type        = map(string)
-  description = "Tags to be applied to all resources that are created by this module."
   default     = {}
+  description = "The tags to associate with resources created by this module."
 }
+
 
 //variables required by resource names module
 variable "resource_names_map" {
@@ -148,27 +129,25 @@ variable "resource_names_map" {
     name       = string
     max_length = optional(number, 60)
   }))
-
   default = {
     resource_group = {
-      name       = "rg"
-      max_length = 80
+      name = "rg"
     }
     virtual_network = {
-      name       = "vnet"
-      max_length = 80
+      name = "vnet"
     }
   }
 }
 variable "environment" {
   description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
   type        = string
+  default     = "sandbox"
 }
 
 variable "environment_number" {
   description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
   type        = string
-  default     = "000"
+  default     = "001"
 }
 
 variable "resource_number" {
@@ -184,11 +163,13 @@ variable "logical_product_family" {
     Example: org_name, department_name.
   EOF
   nullable    = false
+  default     = "launch"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
     error_message = "The variable must contain letters, numbers, -, _, and .."
   }
+
 }
 
 variable "logical_product_service" {
@@ -198,6 +179,7 @@ variable "logical_product_service" {
     For example, backend, frontend, middleware etc.
   EOF
   nullable    = false
+  default     = "vnet"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_service))
