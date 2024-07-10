@@ -1,5 +1,5 @@
-# Complete example
- This module emulates a Hub and Spoke architecture model by creating multiple Vnets and subnets using same terraform module. Each Vnet is created in its own Resource Group. The Vnet attributes are configurable through the input parameters
+# Private endpoint example
+This module demonstrates the capability to create private endpoints to existing services within the vnet
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
