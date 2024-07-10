@@ -168,8 +168,8 @@ No resources.
 | <a name="output_vnet_location"></a> [vnet\_location](#output\_vnet\_location) | The location of the newly created vNet |
 | <a name="output_vnet_name"></a> [vnet\_name](#output\_vnet\_name) | The Name of the newly created vNet |
 | <a name="output_subnet_map"></a> [subnet\_map](#output\_subnet\_map) | The ids of subnets created inside the newly created vNet |
-| <a name="output_private_dns_zones"></a> [private\_dns\_zones](#output\_private\_dns\_zones) | The private dns zones created inside the newly created vNet |
-| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | The private endpoints created inside the newly created vNet |
+| <a name="output_private_dns_zones"></a> [private\_dns\_zones](#output\_private\_dns\_zones) | The private dns zones associated with the newly created vNet |
+| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | The private endpoints associated with the newly created vNet |
 | <a name="output_subnet_name_id_map"></a> [subnet\_name\_id\_map](#output\_subnet\_name\_id\_map) | Can be queried subnet-id by subnet name by using lookup(module.vnet.vnet\_subnets\_name\_id, subnet1) |
 | <a name="output_resource_group_id"></a> [resource\_group\_id](#output\_resource\_group\_id) | resource group id |
 | <a name="output_resource_group_name"></a> [resource\_group\_name](#output\_resource\_group\_name) | resource group name |

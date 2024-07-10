@@ -42,12 +42,12 @@ output "subnet_map" {
 }
 
 output "private_dns_zones" {
-  description = "The private dns zones created inside the newly created vNet"
+  description = "The private dns zones associated with the newly created vNet"
   value       = module.private_dns_zones
 }
 
 output "private_endpoints" {
-  description = "The private endpoints created inside the newly created vNet"
+  description = "The private endpoints associated with the newly created vNet"
   value       = module.private_endpoints
 }
 

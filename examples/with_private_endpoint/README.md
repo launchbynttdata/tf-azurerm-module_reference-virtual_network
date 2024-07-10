@@ -54,6 +54,6 @@ No resources.
 |------|-------------|
 | <a name="output_transformed_routes"></a> [transformed\_routes](#output\_transformed\_routes) | n/a |
 | <a name="output_subnet_route_associations"></a> [subnet\_route\_associations](#output\_subnet\_route\_associations) | n/a |
-| <a name="output_private_dns_zones"></a> [private\_dns\_zones](#output\_private\_dns\_zones) | The private dns zones created inside the newly created vNet |
-| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | The private endpoints created inside the newly created vNet |
+| <a name="output_private_dns_zones"></a> [private\_dns\_zones](#output\_private\_dns\_zones) | The private dns zones associated with the newly created vNet |
+| <a name="output_private_endpoints"></a> [private\_endpoints](#output\_private\_endpoints) | The private endpoints associated with the newly created vNet |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
