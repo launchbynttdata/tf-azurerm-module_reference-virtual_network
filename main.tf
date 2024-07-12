@@ -76,6 +76,93 @@ module "subnets" {
   depends_on = [module.network]
 }
 
+module "private_dns_zones" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.private_dns_zone_suffixes
+
+  zone_name           = each.key
+  resource_group_name = module.resource_group.name
+
+  tags = local.tags
+
+  depends_on = [module.resource_group]
+}
+
+module "private_dns_zone_vnet_links" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.private_dns_zone_suffixes
+
+  link_name             = module.network.vnet_name
+  resource_group_name   = module.resource_group.name
+  private_dns_zone_name = module.private_dns_zones[each.key].zone_name
+  virtual_network_id    = module.network.vnet_id
+  registration_enabled  = false
+
+  tags = local.tags
+
+  depends_on = [module.private_dns_zones, module.network]
+}
+
+module "private_endpoint_resource_names" {
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 1.0"
+
+  for_each = var.private_endpoints
+
+  region                  = join("", split("-", var.location))
+  class_env               = var.environment
+  cloud_resource_type     = var.private_endpoint_resource_names_map["private_endpoint"].name
+  instance_env            = var.environment_number
+  instance_resource       = var.resource_number
+  maximum_length          = var.private_endpoint_resource_names_map["private_endpoint"].max_length
+  logical_product_family  = var.logical_product_family
+  logical_product_service = each.key
+  use_azure_region_abbr   = true
+}
+
+module "private_service_connection_resource_names" {
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 1.0"
+
+  for_each = var.private_endpoints
+
+  region                  = join("", split("-", var.location))
+  class_env               = var.environment
+  cloud_resource_type     = var.private_endpoint_resource_names_map["private_service_connection"].name
+  instance_env            = var.environment_number
+  instance_resource       = var.resource_number
+  maximum_length          = var.private_endpoint_resource_names_map["private_service_connection"].max_length
+  logical_product_family  = var.logical_product_family
+  logical_product_service = each.key
+  use_azure_region_abbr   = true
+}
+
+module "private_endpoints" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.private_endpoints
+
+  region                          = var.location
+  endpoint_name                   = module.private_endpoint_resource_names[each.key].standard
+  is_manual_connection            = false
+  resource_group_name             = module.resource_group.name
+  private_service_connection_name = module.private_service_connection_resource_names[each.key].standard
+  private_connection_resource_id  = each.value.target_resource_id
+  subresource_names               = each.value.private_link_subresource_names
+  subnet_id                       = module.subnets[each.value.subnet_name].id
+  private_dns_zone_ids            = [for suffix in each.value.private_dns_zone_suffixes : module.private_dns_zones[suffix].id]
+  private_dns_zone_group_name     = each.value.private_dns_zone_group_name
+
+  tags = merge(local.tags, { resource_name = module.private_endpoint_resource_names[each.key].standard })
+
+  depends_on = [module.private_dns_zones, module.subnets]
+}
+
 module "route_tables" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/route_table/azurerm"
   version = "~> 1.0"

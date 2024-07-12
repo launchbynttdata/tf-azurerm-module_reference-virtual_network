@@ -41,6 +41,16 @@ output "subnet_map" {
   value       = { for key, value in module.subnets : key => value.subnet }
 }
 
+output "private_dns_zones" {
+  description = "The private dns zones associated with the newly created vNet"
+  value       = module.private_dns_zones
+}
+
+output "private_endpoints" {
+  description = "The private endpoints associated with the newly created vNet"
+  value       = module.private_endpoints
+}
+
 output "subnet_name_id_map" {
   description = "Can be queried subnet-id by subnet name by using lookup(module.vnet.vnet_subnets_name_id, subnet1)"
   value       = { for key, value in module.subnets : key => value.id }
