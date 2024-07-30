@@ -43,12 +43,23 @@ output "subnet_map" {
 
 output "private_dns_zones" {
   description = "The private dns zones associated with the newly created vNet"
-  value       = module.private_dns_zones
+  value = merge(
+    module.private_dns_zones,
+    { for key, value in module.monitor_private_link_scope_dns_zone : key => value }
+  )
 }
 
 output "private_endpoints" {
   description = "The private endpoints associated with the newly created vNet"
-  value       = module.private_endpoints
+  value = merge(
+    module.private_endpoints,
+    { for key, value in module.monitor_private_link_scope_private_endpoint : key => value }
+  )
+}
+
+output "monitor_private_link_scope_id" {
+  description = "The id of the monitor private link scope"
+  value       = length(module.monitor_private_link_scope) > 0 ? module.monitor_private_link_scope[0].private_link_scope_id : null
 }
 
 output "subnet_name_id_map" {
