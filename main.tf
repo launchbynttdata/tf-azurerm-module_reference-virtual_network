@@ -17,10 +17,10 @@ module "resource_names" {
   for_each = var.resource_names_map
 
   region                  = join("", split("-", var.location))
-  class_env               = var.environment
+  class_env               = coalesce(var.class_env, var.environment)
   cloud_resource_type     = each.value.name
-  instance_env            = var.environment_number
-  instance_resource       = var.resource_number
+  instance_env            = coalesce(var.instance_env, var.environment_number)
+  instance_resource       = coalesce(var.instance_resource, var.resource_number)
   maximum_length          = each.value.max_length
   logical_product_family  = var.logical_product_family
   logical_product_service = var.logical_product_service
@@ -73,7 +73,7 @@ module "subnets" {
   route_table_id            = each.value.route_table_id
   route_table_name          = each.value.route_table_name
 
-  depends_on = [module.network]
+  depends_on = [module.network, module.route_tables]
 }
 
 module "private_dns_zones" {
@@ -184,7 +184,7 @@ module "routes" {
 
   routes = local.transformed_routes
 
-  depends_on = [module.resource_group]
+  depends_on = [module.resource_group, module.route_tables]
 }
 
 module "monitor_private_link_scope" {

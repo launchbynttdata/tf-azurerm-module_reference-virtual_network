@@ -178,22 +178,62 @@ variable "resource_names_map" {
     }
   }
 }
+
+// TODO: remove this in favor of `class_env` next major release
 variable "environment" {
   description = "Environment in which the resource should be provisioned like dev, qa, prod etc."
   type        = string
   default     = "sandbox"
 }
 
+// TODO: give this a default value and make non-nullable in the next major release
+variable "class_env" {
+  type        = string
+  description = "Environment where resource is going to be deployed. For example. dev, qa, uat"
+  default     = null
+
+  validation {
+    condition     = length(regexall("\\b \\b", coalesce(var.class_env, "dev"))) == 0
+    error_message = "Spaces between the words are not allowed."
+  }
+}
+
+// TODO: remove this in favor of `instance_env` next major release
 variable "environment_number" {
-  description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
+  description = "The environment count for the respective environment. Defaults to 001. Increments in value of 1"
   type        = string
   default     = "001"
 }
 
+// TODO: give this a default value and make non-nullable in the next major release
+variable "instance_env" {
+  type        = number
+  description = "Number that represents the instance of the environment."
+  default     = null
+
+  validation {
+    condition     = coalesce(var.instance_env, 0) >= 0 && coalesce(var.instance_env, 0) <= 100
+    error_message = "Instance number should be between 0 to 999."
+  }
+}
+
+// TODO: remove this in favore of `instance_resource` next major release
 variable "resource_number" {
   description = "The resource count for the respective resource. Defaults to 000. Increments in value of 1"
   type        = string
   default     = "000"
+}
+
+// TODO: give this a default value and make non-nullable in the next major release
+variable "instance_resource" {
+  type        = number
+  description = "Number that represents the instance of the resource."
+  default     = null
+
+  validation {
+    condition     = coalesce(var.instance_resource, 0) >= 0 && coalesce(var.instance_resource, 0) <= 100
+    error_message = "Instance number should be between 0 to 100."
+  }
 }
 
 variable "logical_product_family" {

@@ -1,3 +1,7 @@
+class_env         = "sandbox"
+instance_env      = 0
+instance_resource = 0
+
 location = "eastus"
 
 address_space = ["172.16.0.0/16"]
