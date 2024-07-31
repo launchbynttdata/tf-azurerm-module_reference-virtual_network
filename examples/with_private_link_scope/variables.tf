@@ -200,9 +200,9 @@ variable "class_env" {
 
 // TODO: remove this in favor of `instance_env` next major release
 variable "environment_number" {
-  description = "The environment count for the respective environment. Defaults to 001. Increments in value of 1"
+  description = "The environment count for the respective environment. Defaults to 000. Increments in value of 1"
   type        = string
-  default     = "001"
+  default     = "000"
 }
 
 // TODO: give this a default value and make non-nullable in the next major release
