@@ -15,13 +15,13 @@ package test
 import (
 	"testing"
 
-	testimpl "github.com/launchbynttdata/tf-azurerm-module_reference-virtual_network/tests/testimpl"
 	"github.com/launchbynttdata/lcaf-component-terratest/lib"
 	"github.com/launchbynttdata/lcaf-component-terratest/types"
+	testimpl "github.com/launchbynttdata/tf-azurerm-module_reference-virtual_network/tests/testimpl"
 )
 
 const (
-	testConfigsExamplesFolderDefault = "../../examples"
+	testConfigsExamplesFolderDefault = "../../examples/complete"
 	infraTFVarFileNameDefault        = "test.tfvars"
 )
 

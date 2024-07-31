@@ -51,9 +51,8 @@ variable "subnets" {
     delegation = optional(map(object({
       service_name    = string
       service_actions = list(string)
-    })), {})
+    })), null)
     service_endpoints                             = optional(list(string), []),
-    private_endpoint_network_policies             = optional(string, null)
     private_endpoint_network_policies_enabled     = optional(bool, false)
     private_link_service_network_policies_enabled = optional(bool, false)
     network_security_group_id                     = optional(string, null)
@@ -65,25 +64,6 @@ variable "subnets" {
   validation {
     condition     = alltrue([for subnet_name, subnet in var.subnets : !(subnet.route_table_id != null && subnet.route_table_alias != null)])
     error_message = "Subnets may define either a route_table_id or a route_table_alias, but not both."
-  }
-}
-
-variable "private_endpoint_resource_names_map" {
-  description = "A map of key to resource_name that will be used to generate private endpoint resource names"
-  type = map(object({
-    name       = string
-    max_length = optional(number, 60)
-  }))
-
-  default = {
-    private_endpoint = {
-      name       = "pe"
-      max_length = 80
-    }
-    private_service_connection = {
-      name       = "psc"
-      max_length = 80
-    }
   }
 }
 
@@ -106,10 +86,32 @@ variable "private_endpoints" {
     subnet_name                    = string
   }))
   default = {}
+}
+
+variable "route_tables" {
+  description = "A mapping of route table aliases to route table configuration."
+  type = map(object({
+    name                          = string
+    disable_bgp_route_propagation = optional(bool, false)
+    extra_tags                    = optional(map(string), {})
+  }))
+  default = {}
+}
+
+variable "routes" {
+  description = "A mapping of routes to create."
+  type = map(object({
+    name                   = string
+    route_table_alias      = string
+    address_prefix         = string
+    next_hop_type          = string
+    next_hop_in_ip_address = optional(string, null)
+  }))
+  default = {}
 
   validation {
-    condition     = alltrue([for key, value in var.private_endpoints : key != "ampls"])
-    error_message = "The key 'ampls' is reserved for the monitor private link scope private endpoint"
+    condition     = alltrue([for route_name, route_definition in var.routes : contains(["VirtualNetworkGateway", "VnetLocal", "Internet", "VirtualAppliance", "None"], route_definition.next_hop_type)])
+    error_message = "next_hop_type must contain 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', or 'None'."
   }
 }
 
@@ -143,38 +145,12 @@ variable "monitor_private_link_scope_dns_zone_suffixes" {
   ]
 }
 
-variable "route_tables" {
-  description = "A mapping of route table aliases to route table configuration."
-  type = map(object({
-    name                          = string
-    disable_bgp_route_propagation = optional(bool, false)
-    extra_tags                    = optional(map(string), {})
-  }))
-  default = {}
-}
-
-variable "routes" {
-  description = "A mapping of routes to create."
-  type = map(object({
-    name                   = string
-    route_table_alias      = string
-    address_prefix         = string
-    next_hop_type          = string
-    next_hop_in_ip_address = optional(string, null)
-  }))
-  default = {}
-
-  validation {
-    condition     = alltrue([for route_name, route_definition in var.routes : contains(["VirtualNetworkGateway", "VnetLocal", "Internet", "VirtualAppliance", "None"], route_definition.next_hop_type)])
-    error_message = "next_hop_type must contain 'VirtualNetworkGateway', 'VnetLocal', 'Internet', 'VirtualAppliance', or 'None'."
-  }
-}
-
 variable "tags" {
   type        = map(string)
-  description = "Tags to be applied to all resources that are created by this module."
   default     = {}
+  description = "The tags to associate with resources created by this module."
 }
+
 
 //variables required by resource names module
 variable "resource_names_map" {
@@ -183,7 +159,6 @@ variable "resource_names_map" {
     name       = string
     max_length = optional(number, 60)
   }))
-
   default = {
     resource_group = {
       name       = "rg"
@@ -268,11 +243,13 @@ variable "logical_product_family" {
     Example: org_name, department_name.
   EOF
   nullable    = false
+  default     = "launch"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
     error_message = "The variable must contain letters, numbers, -, _, and .."
   }
+
 }
 
 variable "logical_product_service" {
@@ -282,6 +259,7 @@ variable "logical_product_service" {
     For example, backend, frontend, middleware etc.
   EOF
   nullable    = false
+  default     = "vnet"
 
   validation {
     condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_service))

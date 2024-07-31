@@ -17,10 +17,10 @@ module "resource_names" {
   for_each = var.resource_names_map
 
   region                  = join("", split("-", var.location))
-  class_env               = var.environment
+  class_env               = coalesce(var.class_env, var.environment)
   cloud_resource_type     = each.value.name
-  instance_env            = var.environment_number
-  instance_resource       = var.resource_number
+  instance_env            = coalesce(var.instance_env, var.environment_number)
+  instance_resource       = coalesce(var.instance_resource, var.resource_number)
   maximum_length          = each.value.max_length
   logical_product_family  = var.logical_product_family
   logical_product_service = var.logical_product_service
@@ -73,7 +73,7 @@ module "subnets" {
   route_table_id            = each.value.route_table_id
   route_table_name          = each.value.route_table_name
 
-  depends_on = [module.network]
+  depends_on = [module.network, module.route_tables]
 }
 
 module "private_dns_zones" {
@@ -184,5 +184,76 @@ module "routes" {
 
   routes = local.transformed_routes
 
+  depends_on = [module.resource_group, module.route_tables]
+}
+
+module "monitor_private_link_scope" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/azure_monitor_private_link_scope/azurerm"
+  version = "~> 1.0"
+
+  count = var.enable_monitor_private_link_scope ? 1 : 0
+
+  name                = module.resource_names["monitor_private_link_scope"].standard
+  resource_group_name = module.resource_group.name
+
+  linked_resource_ids = {}
+
+  tags = merge(local.tags, {
+    resource_name = module.resource_names["monitor_private_link_scope"].standard
+  })
+
   depends_on = [module.resource_group]
+}
+
+module "monitor_private_link_scope_dns_zone" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.enable_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  zone_name           = each.key
+  resource_group_name = module.resource_group.name
+
+  tags = local.tags
+
+  depends_on = [module.resource_group]
+}
+
+module "monitor_private_link_scope_vnet_link" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.enable_monitor_private_link_scope ? var.monitor_private_link_scope_dns_zone_suffixes : toset([])
+
+  link_name             = replace(each.key, ".", "-")
+  resource_group_name   = module.resource_group.name
+  private_dns_zone_name = module.monitor_private_link_scope_dns_zone[each.key].zone_name
+  virtual_network_id    = module.network.vnet_id
+  registration_enabled  = false
+
+  tags = local.tags
+
+  depends_on = [module.resource_group, module.monitor_private_link_scope_dns_zone]
+}
+
+module "monitor_private_link_scope_private_endpoint" {
+  source  = "terraform.registry.launch.nttdata.com/module_primitive/private_endpoint/azurerm"
+  version = "~> 1.0"
+
+  for_each = var.enable_monitor_private_link_scope ? ["ampls"] : toset([])
+
+  region                          = var.location
+  endpoint_name                   = module.resource_names["monitor_private_link_scope_private_endpoint"].standard
+  is_manual_connection            = false
+  resource_group_name             = module.resource_group.name
+  private_service_connection_name = "azuremonitor"
+  private_connection_resource_id  = module.monitor_private_link_scope[0].private_link_scope_id
+  subresource_names               = ["azuremonitor"]
+  subnet_id                       = module.subnets[var.monitor_private_link_scope_subnet_name].id
+  private_dns_zone_ids            = [for zone in module.monitor_private_link_scope_dns_zone : zone.id]
+  private_dns_zone_group_name     = "azuremonitor"
+
+  tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_private_endpoint"].standard })
+
+  depends_on = [module.resource_group, module.subnets, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
 }
