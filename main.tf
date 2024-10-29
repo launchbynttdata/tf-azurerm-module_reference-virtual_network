@@ -169,11 +169,10 @@ module "route_tables" {
 
   for_each = local.transformed_route_tables
 
-  name                          = each.value.name
-  location                      = var.location
-  disable_bgp_route_propagation = each.value.disable_bgp_route_propagation
-  resource_group_name           = each.value.resource_group_name
-  tags                          = merge(local.tags, each.value.extra_tags)
+  name                = each.value.name
+  location            = var.location
+  resource_group_name = each.value.resource_group_name
+  tags                = merge(local.tags, each.value.extra_tags)
 
   depends_on = [module.resource_group]
 }

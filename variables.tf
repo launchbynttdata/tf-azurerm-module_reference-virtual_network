@@ -146,9 +146,8 @@ variable "monitor_private_link_scope_dns_zone_suffixes" {
 variable "route_tables" {
   description = "A mapping of route table aliases to route table configuration."
   type = map(object({
-    name                          = string
-    disable_bgp_route_propagation = optional(bool, false)
-    extra_tags                    = optional(map(string), {})
+    name       = string
+    extra_tags = optional(map(string), {})
   }))
   default = {}
 }
