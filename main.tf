@@ -27,6 +27,23 @@ module "resource_names" {
   use_azure_region_abbr   = true
 }
 
+module "resource_names_v2" {
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 2.0"
+
+  for_each = local.use_v2_resource_names ? var.resource_names_map : {}
+
+  region                  = join("", split("-", var.location))
+  class_env               = coalesce(var.class_env, var.environment)
+  cloud_resource_type     = each.value.name
+  instance_env            = coalesce(var.instance_env, var.environment_number)
+  instance_resource       = coalesce(var.instance_resource, var.resource_number)
+  maximum_length          = each.value.max_length
+  logical_product_family  = var.logical_product_family
+  logical_product_service = var.logical_product_service
+  use_azure_region_abbr   = true
+}
+
 module "resource_group" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/resource_group/azurerm"
   version = "~> 1.0"
@@ -124,11 +141,45 @@ module "private_endpoint_resource_names" {
   use_azure_region_abbr   = true
 }
 
+module "private_endpoint_resource_names_v2" {
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 2.0"
+
+  for_each = local.use_v2_resource_names ? var.private_endpoints : {}
+
+  region                  = join("", split("-", var.location))
+  class_env               = var.environment
+  cloud_resource_type     = var.private_endpoint_resource_names_map["private_endpoint"].name
+  instance_env            = var.environment_number
+  instance_resource       = var.resource_number
+  maximum_length          = var.private_endpoint_resource_names_map["private_endpoint"].max_length
+  logical_product_family  = var.logical_product_family
+  logical_product_service = each.key
+  use_azure_region_abbr   = true
+}
+
 module "private_service_connection_resource_names" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
   version = "~> 1.0"
 
   for_each = var.private_endpoints
+
+  region                  = join("", split("-", var.location))
+  class_env               = var.environment
+  cloud_resource_type     = var.private_endpoint_resource_names_map["private_service_connection"].name
+  instance_env            = var.environment_number
+  instance_resource       = var.resource_number
+  maximum_length          = var.private_endpoint_resource_names_map["private_service_connection"].max_length
+  logical_product_family  = var.logical_product_family
+  logical_product_service = each.key
+  use_azure_region_abbr   = true
+}
+
+module "private_service_connection_resource_names_v2" {
+  source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
+  version = "~> 2.0"
+
+  for_each = local.use_v2_resource_names ? var.private_endpoints : {}
 
   region                  = join("", split("-", var.location))
   class_env               = var.environment
@@ -148,10 +199,10 @@ module "private_endpoints" {
   for_each = var.private_endpoints
 
   region                          = var.location
-  endpoint_name                   = module.private_endpoint_resource_names[each.key].standard
+  endpoint_name                   = local.use_v2_resource_names ? module.private_endpoint_resource_names_v2[each.key].standard : module.private_endpoint_resource_names[each.key].standard
   is_manual_connection            = false
   resource_group_name             = module.resource_group.name
-  private_service_connection_name = module.private_service_connection_resource_names[each.key].standard
+  private_service_connection_name = local.use_v2_resource_names ? module.private_service_connection_resource_names_v2[each.key].standard : module.private_service_connection_resource_names[each.key].standard
   private_connection_resource_id  = each.value.target_resource_id
   subresource_names               = each.value.private_link_subresource_names
   subnet_id                       = module.subnets[each.value.subnet_name].id
