@@ -204,6 +204,12 @@ variable "resource_names_map" {
   }
 }
 
+variable "resource_names_version" {
+  description = "Major version of the resource names module to use"
+  type        = string
+  default     = "1"
+}
+
 // TODO: remove this in favor of `class_env` next major release
 variable "environment" {
   description = "Environment in which the resource should be provisioned like dev, qa, prod etc."

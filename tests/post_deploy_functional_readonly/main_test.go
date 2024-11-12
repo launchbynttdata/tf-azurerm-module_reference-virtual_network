@@ -38,6 +38,9 @@ func TestVnetModule(t *testing.T) {
 			"with_private_endpoint": {
 				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
 			},
+			"with_private_link_scope": {
+				"IS_TERRAFORM_IDEMPOTENT_APPLY": false,
+			},
 		}).
 		Build()
 

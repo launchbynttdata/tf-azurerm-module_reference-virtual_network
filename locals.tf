@@ -4,8 +4,10 @@ locals {
   }
   tags = merge(local.default_tags, var.tags)
 
-  resource_group_name  = module.resource_names["resource_group"].standard
-  virtual_network_name = module.resource_names["virtual_network"].standard
+  use_v2_resource_names = (var.resource_names_version == "2")
+
+  resource_group_name  = local.use_v2_resource_names ? module.resource_names_v2["resource_group"].standard : module.resource_names["resource_group"].standard
+  virtual_network_name = local.use_v2_resource_names ? module.resource_names_v2["virtual_network"].standard : module.resource_names["virtual_network"].standard
 
   transformed_subnets = {
     for subnet_alias, subnet_definition in var.subnets :
