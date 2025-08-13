@@ -294,3 +294,15 @@ variable "logical_product_service" {
     error_message = "The variable must contain letters, numbers, -, _, and .."
   }
 }
+
+variable "private_dns_zone_ids" {
+  type        = list(string)
+  description = "List of private DNS zone IDs to associate with the private endpoint."
+  default     = []
+}
+
+variable "private_dns_zone_enabled" {
+  description = "Whether to enable a private DNS zone for the Postgres Flexible Server's private endpoint"
+  type        = bool
+  default     = true
+}

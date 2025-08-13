@@ -308,3 +308,17 @@ module "monitor_private_link_scope_private_endpoint" {
 
   depends_on = [module.resource_group, module.subnets, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
 }
+
+resource "azurerm_private_dns_zone" "this" {
+  count = var.private_dns_zone_enabled && length(var.private_dns_zone_ids) == 0 ? 1 : 0
+
+  name                = "privatelink.postgres.database.azure.com"
+  resource_group_name = module.resource_group.name
+  tags                = var.tags
+}
+
+locals {
+  computed_private_dns_zone_ids = length(var.private_dns_zone_ids) > 0 ? var.private_dns_zone_ids : (
+    var.private_dns_zone_enabled ? [azurerm_private_dns_zone.this[0].id] : []
+  )
+}
