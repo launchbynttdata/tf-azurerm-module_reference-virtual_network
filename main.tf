@@ -325,3 +325,11 @@ locals {
     var.private_dns_zone_enabled ? [azurerm_private_dns_zone.this[0].id] : []
   )
 }
+
+# Link DNS Zone to VNET
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres" {
+  name                  = "postgres-dns-link"
+  resource_group_name   = module.resource_group.name
+  private_dns_zone_name = azurerm_private_dns_zone.postgres.name
+  virtual_network_id    = module.vnet.id
+}
