@@ -310,13 +310,13 @@ module "monitor_private_link_scope_private_endpoint" {
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
-  name                = var.private_dns_zone_suffix
+  name                = "privatelink.postgres.database.azure.com"
   resource_group_name = module.resource_group.name
   tags                = var.tags
 }
 
 output "postgres_private_dns_zone_id" {
-  value       = module.private_dns_zones[var.private_dns_zone_suffix].id
+  value       = azurerm_private_dns_zone.postgres.id
   description = "The ID of the Postgres private DNS zone."
 }
 
