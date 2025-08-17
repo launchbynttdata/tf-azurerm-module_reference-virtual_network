@@ -87,10 +87,10 @@ variable "private_endpoint_resource_names_map" {
   }
 }
 
-variable "private_dns_zone_suffixes" {
-  description = "A set of private DNS zones to create"
-  type        = set(string)
-  default     = []
+variable "private_dns_zone_suffix" {
+  description = "The suffix for the private DNS zone to create (e.g. privatelink.postgres.database.azure.com)"
+  type        = string
+  default     = ""
 }
 
 variable "private_endpoints" {

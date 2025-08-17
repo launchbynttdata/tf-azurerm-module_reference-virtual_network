@@ -97,7 +97,7 @@ module "private_dns_zones" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
   version = "~> 1.0"
 
-  for_each = var.private_dns_zone_suffixes
+  for_each = { "${var.private_dns_zone_suffix}" = true }
 
   zone_name           = each.key
   resource_group_name = module.resource_group.name
@@ -310,13 +310,13 @@ module "monitor_private_link_scope_private_endpoint" {
 }
 
 resource "azurerm_private_dns_zone" "postgres" {
-  name                = "privatelink.postgres.database.azure.com"
+  name                = var.private_dns_zone_suffix
   resource_group_name = module.resource_group.name
   tags                = var.tags
 }
 
 output "postgres_private_dns_zone_id" {
-  value       = azurerm_private_dns_zone.postgres.id
+  value       = module.private_dns_zones[var.private_dns_zone_suffix].id
   description = "The ID of the Postgres private DNS zone."
 }
 
