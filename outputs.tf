@@ -92,3 +92,6 @@ output "subnet_route_associations" {
 output "postgres_private_dns_zone_id" {
   value = azurerm_private_dns_zone.this.id
 }
+output "private_endpoint_subnet_id" {
+  value = azurerm_subnet.private_endpoint_subnet.id
+}
