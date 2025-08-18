@@ -142,7 +142,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
   tags                    = local.tags
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_vnet" {
   count                  = var.private_dns_zone_enabled ? 1 : 0
   name                   = "${module.network.vnet_name}-${var.private_dns_zone_suffix}-link"
   resource_group_name    = module.resource_group.name
