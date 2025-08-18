@@ -364,7 +364,7 @@ output "postgres_private_dns_zone_id" {
 }
 
 # Link the zone to your hub/spoke VNet that hosts 'private-endpoint-subnet'
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_v2" {
   name                  = "${module.resource_names["private_dns_zone"].result}-link"
   resource_group_name   = module.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres.name
