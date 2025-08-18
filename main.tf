@@ -97,31 +97,48 @@ module "private_dns_zones" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_zone/azurerm"
   version = "~> 1.0"
 
-  for_each = { "${var.private_dns_zone_suffix}" = true }
+  for_each = var.private_dns_zone_suffixes
 
   zone_name           = each.key
   resource_group_name = module.resource_group.name
-
-  tags = local.tags
+  tags                = local.tags
 
   depends_on = [module.resource_group]
 }
 
+// Link all DNS zones to the VNet
 module "private_dns_zone_vnet_links" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
   version = "~> 1.0"
 
   for_each = var.private_dns_zone_suffixes
 
-  link_name             = module.network.vnet_name
+  link_name             = "${module.network.vnet_name}-${each.key}-link"
   resource_group_name   = module.resource_group.name
   private_dns_zone_name = module.private_dns_zones[each.key].zone_name
-  virtual_network_id    = module.network.vnet_id
+  virtual_network_id    = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
   registration_enabled  = false
 
   tags = local.tags
 
   depends_on = [module.private_dns_zones, module.network]
+}
+
+// Conditionally create Postgres DNS zone and link
+resource "azurerm_private_dns_zone" "postgres" {
+  count               = var.private_dns_zone_enabled ? 1 : 0
+  name                = "privatelink.postgres.database.azure.com"
+  resource_group_name = module.resource_group.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
+  count                  = var.private_dns_zone_enabled ? 1 : 0
+  name                   = "postgres-link"
+  resource_group_name    = module.resource_group.name
+  private_dns_zone_name  = azurerm_private_dns_zone.postgres[0].name
+  virtual_network_id     = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
+  registration_enabled   = false
 }
 
 module "private_endpoint_resource_names" {
