@@ -378,7 +378,12 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_v2" {
 output "postgres_private_dns_zone_id" {
   private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
   virtual_network_id    = module.virtual_network.id
-  registration_enabled  = false
+output "postgres_private_dns_zone_info" {
+  value = {
+    private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
+    virtual_network_id    = module.network.vnet_id
+    registration_enabled  = false
+  }
 }
 output "postgres_private_dns_zone_id" {
   value = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].id : null
