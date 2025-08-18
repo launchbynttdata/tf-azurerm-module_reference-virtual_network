@@ -90,10 +90,11 @@ output "subnet_route_associations" {
 }
 
 output "postgres_private_dns_zone_id" {
-  value       = azurerm_private_dns_zone.postgres.id
   description = "The ID of the Postgres private DNS zone."
+  value       = module.private_dns_zones["privatelink.postgres.database.azure.com"].id
 }
 
 output "private_endpoint_subnet_id" {
-  value = azurerm_subnet.private_endpoint_subnet.id
+  description = "The ID of the subnet for private endpoints (e.g., 'private-endpoint-subnet')."
+  value       = module.subnets["private-endpoint-subnet"].id
 }
