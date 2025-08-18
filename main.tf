@@ -25,7 +25,6 @@ module "resource_names" {
   logical_product_family  = var.logical_product_family
   logical_product_service = var.logical_product_service
   use_azure_region_abbr   = true
-}
 
 module "resource_names_v2" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
@@ -329,7 +328,7 @@ module "monitor_private_link_scope_private_endpoint" {
 
 resource "azurerm_private_dns_zone" "private_zone" {
   name                = var.zone_name
-  resource_group_name = var.resource_group_name
+  resource_group_name = module.resource_group.name
   dynamic "soa_record" {
     for_each = var.soa_record != null ? [1] : []
     content {

@@ -295,22 +295,8 @@ variable "logical_product_family" {
   EOF
   nullable    = false
 
-  validation {
-    condition     = can(regex("^[_\\-A-Zaz
-  description = "List of private DNS zone IDs to associate with the private endpoint."
-  default     = []
+validation {
+  condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
+  error_message = "logical_product_family must only contain letters, numbers, underscores, or hyphens."
 }
-
-variable "private_dns_zone_enabled" {
-  description = "Whether to enable a private DNS zone for the Postgres Flexible Server's private endpoint"
-  type        = bool
-  default     = true
-}
-
-variable "vnet_id"             { type = string } # for vnet link
-
-# Optional: override zone name if needed
-variable "zone_name" {
-  type    = string
-  default = "privatelink.postgres.database.azure.com"
 }
