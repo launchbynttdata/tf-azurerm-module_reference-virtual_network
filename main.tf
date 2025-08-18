@@ -309,28 +309,42 @@ module "monitor_private_link_scope_private_endpoint" {
   depends_on = [module.resource_group, module.subnets, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
 }
 
+resource "azurerm_private_dns_zone" "private_zone" {
+  name                = var.zone_name
+  resource_group_name = var.resource_group_name
+  dynamic "soa_record" {
+    for_each = var.soa_record != null ? [1] : []
+    content {
+      email        = var.soa_record.email
+      expire_time  = lookup(var.soa_record, "expire_time", 2419200)
+      minimum_ttl  = lookup(var.soa_record, "minimum_ttl", 10)
+      refresh_time = lookup(var.soa_record, "refresh_time", 3600)
+      retry_time   = lookup(var.soa_record, "retry_time", 300)
+      ttl          = lookup(var.soa_record, "ttl", 3600)
+      tags         = merge(var.tags, var.soa_record.tags)
+    }
+  }
+
+  tags = var.tags
+
+}
+
+# Postgres private DNS zone
 resource "azurerm_private_dns_zone" "postgres" {
   name                = "privatelink.postgres.database.azure.com"
   resource_group_name = module.resource_group.name
   tags                = var.tags
 }
 
-output "postgres_private_dns_zone_id" {
-  value       = azurerm_private_dns_zone.postgres.id
-  description = "The ID of the Postgres private DNS zone."
-}
-
-locals {
-  computed_private_dns_zone_ids = length(var.private_dns_zone_ids) > 0 ? var.private_dns_zone_ids : (
-    var.private_dns_zone_enabled ? [azurerm_private_dns_zone.this[0].id] : []
-  )
-}
-
-# Link DNS Zone to VNET
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres" {
-  name                  = "postgres-dns-link"
+# Link the zone to your hub/spoke VNet that hosts 'private-endpoint-subnet'
+resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
+  name                  = "${module.resource_names["private_dns_zone"].result}-link"
   resource_group_name   = module.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres.name
-  virtual_network_id    = module.vnet.id
+  virtual_network_id    = module.virtual_network.id
+  registration_enabled  = false
 }
 
+output "postgres_private_dns_zone_id" {
+  value = azurerm_private_dns_zone.postgres.id
+}

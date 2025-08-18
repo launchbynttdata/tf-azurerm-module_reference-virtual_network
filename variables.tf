@@ -306,3 +306,11 @@ variable "private_dns_zone_enabled" {
   type        = bool
   default     = true
 }
+
+variable "vnet_id"             { type = string } # for vnet link
+
+# Optional: override zone name if needed
+variable "zone_name" {
+  type    = string
+  default = "privatelink.postgres.database.azure.com"
+}
