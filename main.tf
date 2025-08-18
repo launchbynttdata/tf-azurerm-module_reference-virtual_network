@@ -370,7 +370,7 @@ output "postgres_private_dns_zone_id" {
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_v2" {
   name                  = "${module.resource_names["private_dns_zone"].result}-link"
   resource_group_name   = module.resource_group.name
-  private_dns_zone_name = azurerm_private_dns_zone.postgres.name
+  private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
   virtual_network_id    = module.network.vnet_id
   registration_enabled  = false
 }
