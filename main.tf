@@ -380,7 +380,6 @@ output "postgres_private_dns_zone_id" {
   virtual_network_id    = module.virtual_network.id
   registration_enabled  = false
 }
-
 output "postgres_private_dns_zone_id" {
   value = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].id : null
 }
