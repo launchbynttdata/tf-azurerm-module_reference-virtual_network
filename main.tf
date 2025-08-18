@@ -349,7 +349,11 @@ resource "azurerm_private_dns_zone" "private_zone" {
     }
   }
 
-  tags = var.tags
+      tags         = merge(local.tags, var.soa_record.tags)
+    }
+  }
+
+  tags = local.tags
 
 }
 
