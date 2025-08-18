@@ -125,7 +125,7 @@ module "private_dns_zone_vnet_links" {
 // Conditionally create Postgres DNS zone and link using zone_name variable and local.tags
 resource "azurerm_private_dns_zone" "postgres" {
   count               = var.private_dns_zone_enabled ? 1 : 0
-  name                = var.zone_name
+  name                = var.private_dns_zone_suffix
   resource_group_name = module.resource_group.name
   tags                = local.tags
 }
