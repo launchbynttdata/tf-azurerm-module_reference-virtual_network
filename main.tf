@@ -368,7 +368,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
   name                  = "${module.resource_names["private_dns_zone"].result}-link"
   resource_group_name   = module.resource_group.name
   private_dns_zone_name = azurerm_private_dns_zone.postgres.name
-  virtual_network_id    = module.virtual_network.id
+  virtual_network_id    = module.network.vnet_id
   registration_enabled  = false
 }
 
