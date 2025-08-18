@@ -93,8 +93,3 @@ output "postgres_private_dns_zone_id" {
   description = "The ID of the Postgres private DNS zone."
   value       = var.private_dns_zone_enabled ? azurerm_private_dns_zone.postgres[0].id : null
 }
-
-output "private_endpoint_subnet_id" {
-  description = "The ID of the subnet for private endpoints (e.g., 'private-endpoint-subnet')."
-  value       = module.subnets["private-endpoint-subnet"].id
-}
