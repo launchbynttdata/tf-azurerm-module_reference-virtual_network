@@ -124,21 +124,22 @@ module "private_dns_zone_vnet_links" {
   depends_on = [module.private_dns_zones, module.network]
 }
 
-// Conditionally create Postgres DNS zone and link
+// Conditionally create Postgres DNS zone and link using zone_name variable and local.tags
 resource "azurerm_private_dns_zone" "postgres" {
   count               = var.private_dns_zone_enabled ? 1 : 0
-  name                = "privatelink.postgres.database.azure.com"
+  name                = var.zone_name
   resource_group_name = module.resource_group.name
-  tags                = var.tags
+  tags                = local.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
   count                  = var.private_dns_zone_enabled ? 1 : 0
-  name                   = "postgres-link"
+  name                   = "${module.network.vnet_name}-${var.zone_name}-link"
   resource_group_name    = module.resource_group.name
   private_dns_zone_name  = azurerm_private_dns_zone.postgres[0].name
   virtual_network_id     = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
   registration_enabled   = false
+  tags                   = local.tags
 }
 
 module "private_endpoint_resource_names" {
@@ -346,11 +347,10 @@ resource "azurerm_private_dns_zone" "private_zone" {
 
 }
 
-# Postgres private DNS zone
-resource "azurerm_private_dns_zone" "postgres" {
-  name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = module.resource_group.name
-  tags                = var.tags
+# Output for Postgres private DNS zone ID
+output "postgres_private_dns_zone_id" {
+  value = azurerm_private_dns_zone.postgres.id
+}
 }
 
 # Link the zone to your hub/spoke VNet that hosts 'private-endpoint-subnet'
