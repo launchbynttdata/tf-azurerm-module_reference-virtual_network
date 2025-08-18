@@ -23,7 +23,6 @@ module "resource_names" {
   instance_resource       = coalesce(var.instance_resource, var.resource_number)
   maximum_length          = each.value.max_length
   logical_product_family  = var.logical_product_family
-  logical_product_service = var.logical_product_service
   use_azure_region_abbr   = true
 
 module "resource_names_v2" {
