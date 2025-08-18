@@ -23,7 +23,9 @@ module "resource_names" {
   instance_resource       = coalesce(var.instance_resource, var.resource_number)
   maximum_length          = each.value.max_length
   logical_product_family  = var.logical_product_family
+  logical_product_service = var.logical_product_service
   use_azure_region_abbr   = true
+}
 
 module "resource_names_v2" {
   source  = "terraform.registry.launch.nttdata.com/module_library/resource_name/launch"
@@ -99,57 +101,27 @@ module "private_dns_zones" {
 
   zone_name           = each.key
   resource_group_name = module.resource_group.name
-  tags                = local.tags
+
+  tags = local.tags
 
   depends_on = [module.resource_group]
 }
 
-// Link all DNS zones to the VNet
 module "private_dns_zone_vnet_links" {
   source  = "terraform.registry.launch.nttdata.com/module_primitive/private_dns_vnet_link/azurerm"
   version = "~> 1.0"
 
   for_each = var.private_dns_zone_suffixes
 
-  link_name             = "${module.network.vnet_name}-${each.key}-link"
+  link_name             = module.network.vnet_name
   resource_group_name   = module.resource_group.name
   private_dns_zone_name = module.private_dns_zones[each.key].zone_name
-  virtual_network_id    = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
+  virtual_network_id    = module.network.vnet_id
   registration_enabled  = false
 
   tags = local.tags
 
   depends_on = [module.private_dns_zones, module.network]
-}
-
-// Conditionally create Postgres DNS zone and link using zone_name variable and local.tags
-resource "azurerm_private_dns_zone" "postgres" {
-  count               = var.private_dns_zone_enabled ? 1 : 0
-  name                = var.private_dns_zone_suffix
-  resource_group_name = module.resource_group.name
-  tags                = local.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link" {
-  count                  = var.private_dns_zone_enabled ? 1 : 0
-  name                = var.private_dns_zone_suffix
-  resource_group_name = module.resource_group.name
-  name                   = "${module.network.vnet_name}-${var.private_dns_zone_suffix}-link"
-  resource_group_name     = module.resource_group.name
-  private_dns_zone_name   = azurerm_private_dns_zone.postgres[0].name
-  virtual_network_id      = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
-  registration_enabled    = false
-  tags                    = local.tags
-}
-
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_vnet" {
-  count                  = var.private_dns_zone_enabled ? 1 : 0
-  name                   = "${module.network.vnet_name}-${var.private_dns_zone_suffix}-link"
-  resource_group_name    = module.resource_group.name
-  private_dns_zone_name  = azurerm_private_dns_zone.postgres[0].name
-  virtual_network_id     = var.vnet_id != null ? var.vnet_id : module.network.vnet_id
-  registration_enabled   = false
-  tags                   = local.tags
 }
 
 module "private_endpoint_resource_names" {
@@ -335,56 +307,4 @@ module "monitor_private_link_scope_private_endpoint" {
   tags = merge(var.tags, { resource_name = module.resource_names["monitor_private_link_scope_private_endpoint"].standard })
 
   depends_on = [module.resource_group, module.subnets, module.monitor_private_link_scope, module.monitor_private_link_scope_dns_zone]
-}
-
-resource "azurerm_private_dns_zone" "private_zone" {
-  name                = var.zone_name
-  resource_group_name = module.resource_group.name
-  dynamic "soa_record" {
-    for_each = var.soa_record != null ? [1] : []
-    content {
-      email        = var.soa_record.email
-      expire_time  = lookup(var.soa_record, "expire_time", 2419200)
-      minimum_ttl  = lookup(var.soa_record, "minimum_ttl", 10)
-      refresh_time = lookup(var.soa_record, "refresh_time", 3600)
-      retry_time   = lookup(var.soa_record, "retry_time", 300)
-      ttl          = lookup(var.soa_record, "ttl", 3600)
-      tags         = merge(var.tags, var.soa_record.tags)
-    }
-  }
-
-      tags         = merge(local.tags, var.soa_record.tags)
-    }
-  }
-
-  tags = local.tags
-
-# Removed duplicate/conflicting azurerm_private_dns_zone "private_zone" resource block.
-# Output for Postgres private DNS zone ID
-output "postgres_private_dns_zone_id" {
-  value = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].id : null
-}
-}
-
-# Link the zone to your hub/spoke VNet that hosts 'private-endpoint-subnet'
-resource "azurerm_private_dns_zone_virtual_network_link" "postgres_link_v2" {
-  name                  = "${module.resource_names["private_dns_zone"].result}-link"
-  resource_group_name   = module.resource_group.name
-  private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
-  virtual_network_id    = module.network.vnet_id
-  registration_enabled  = false
-}
-
-output "postgres_private_dns_zone_id" {
-  private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
-  virtual_network_id    = module.virtual_network.id
-output "postgres_private_dns_zone_info" {
-  value = {
-    private_dns_zone_name = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].name : null
-    virtual_network_id    = module.network.vnet_id
-    registration_enabled  = false
-  }
-}
-output "postgres_private_dns_zone_id" {
-  value = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].id : null
 }

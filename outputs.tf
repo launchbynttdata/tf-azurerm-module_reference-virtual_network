@@ -88,8 +88,3 @@ output "route_tables_map" {
 output "subnet_route_associations" {
   value = module.network.subnet_route_associations
 }
-
-output "postgres_private_dns_zone_id" {
-  description = "The ID of the Postgres private DNS zone."
-  value       = var.private_dns_zone_enabled ? azurerm_private_dns_zone.postgres[0].id : null
-}

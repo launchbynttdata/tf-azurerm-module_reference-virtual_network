@@ -87,30 +87,10 @@ variable "private_endpoint_resource_names_map" {
   }
 }
 
-variable "private_dns_zone_suffix" {
-  description = "The suffix for the private DNS zone to create (e.g. privatelink.postgres.database.azure.com)"
-  type        = string
-  default     = "privatelink.postgres.database.azure.com"
-}
-
 variable "private_dns_zone_suffixes" {
-  description = "A set of private DNS zones to create. Always include Postgres for database private endpoints."
+  description = "A set of private DNS zones to create"
   type        = set(string)
-  default     = [
-    "privatelink.postgres.database.azure.com"
-  ]
-}
-
-variable "private_dns_zone_enabled" {
-  description = "Enable creation of private DNS zone for Postgres Flexible Server"
-  type        = bool
-  default     = true
-}
-
-variable "vnet_id" {
-  description = "The ID of the virtual network for DNS zone linking"
-  type        = string
-  default     = null
+  default     = []
 }
 
 variable "private_endpoints" {
@@ -295,8 +275,22 @@ variable "logical_product_family" {
   EOF
   nullable    = false
 
-validation {
-  condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
-  error_message = "logical_product_family must only contain letters, numbers, underscores, or hyphens."
+  validation {
+    condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_family))
+    error_message = "The variable must contain letters, numbers, -, _, and .."
+  }
 }
+
+variable "logical_product_service" {
+  type        = string
+  description = <<EOF
+    (Required) Name of the product service for which the resource is created.
+    For example, backend, frontend, middleware etc.
+  EOF
+  nullable    = false
+
+  validation {
+    condition     = can(regex("^[_\\-A-Za-z0-9]+$", var.logical_product_service))
+    error_message = "The variable must contain letters, numbers, -, _, and .."
+  }
 }
