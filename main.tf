@@ -362,7 +362,7 @@ resource "azurerm_private_dns_zone" "private_zone" {
 # Removed duplicate/conflicting azurerm_private_dns_zone "private_zone" resource block.
 # Output for Postgres private DNS zone ID
 output "postgres_private_dns_zone_id" {
-  value = azurerm_private_dns_zone.postgres.id
+  value = length(azurerm_private_dns_zone.postgres) > 0 ? azurerm_private_dns_zone.postgres[0].id : null
 }
 }
 
