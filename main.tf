@@ -101,8 +101,7 @@ module "private_dns_zones" {
 
   zone_name           = each.key
   resource_group_name = module.resource_group.name
-
-  tags = local.tags
+  tags                = local.tags
 
   depends_on = [module.resource_group]
 }
