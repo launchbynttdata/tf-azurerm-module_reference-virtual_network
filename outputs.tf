@@ -101,13 +101,7 @@ output "private_dns_zone_ids" {
   value       = toset([for _, v in module.private_dns_zones : v.id])
 }
 
-
-# output "zone_name" {
-#   description = "Name of the private hosted zone."
-#   value       = azurerm_private_dns_zone.private_zone.name
-# }
-
-# output "id" {
-#   description = "ID of the private DNS Zone"
-#   value       = azurerm_private_dns_zone.private_zone.id
-# }
+output "postgres_private_dns_zone_id" {
+  description = "The ID of the Postgres private DNS zone."
+  value       = module.private_dns_zones["privatelink.postgres.database.azure.com"].id
+}
