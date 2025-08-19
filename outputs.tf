@@ -129,3 +129,9 @@ output "private_dns_zone_id" {
   description = "ID of a single private DNS zone module instance (if you use one)."
   value       = try(module.private_dns_zone.id, module.private_dns_zone.zone_id, null)
 }
+
+output "postgres_private_dns_zone_id" {
+  description = "The ID of the Postgres private DNS zone."
+  value       = var.private_dns_zone_enabled ? azurerm_private_dns_zone.postgres[0].id : null
+}
+

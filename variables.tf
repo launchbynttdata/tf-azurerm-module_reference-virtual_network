@@ -295,8 +295,14 @@ variable "logical_product_service" {
   }
 }
 
-# variable "target_private_dns_zone_name" {
-#   type        = string
-#   default     = null
-#   description = "If set, outputs the ID for just this zone name from private_dns_zone_ids_by_name."
-# }
+variable "target_private_dns_zone_name" {
+  type        = string
+  default     = null
+  description = "If set, outputs the ID for just this zone name from private_dns_zone_ids_by_name."
+}
+
+variable "private_dns_zone_enabled" {
+  description = "Enable or disable the creation of the Postgres private DNS zone."
+  type        = bool
+  default     = false
+}
