@@ -89,20 +89,43 @@ output "subnet_route_associations" {
   value = module.network.subnet_route_associations
 }
 
-output "selected_private_dns_zone_id" {
-  description = "ID of the selected Private DNS Zone (or null if not found)."
-  value = var.target_private_dns_zone_name == null ? null : lookup(
-    merge(
-      { for name, m in module.private_dns_zones :
-          name => try(m.id, m.zone_id, null)
-        if try(m.id, m.zone_id, null) != null
-      },
-      { for name, m in module.monitor_private_link_scope_dns_zone :
-          name => try(m.id, m.zone_id, null)
-        if try(m.id, m.zone_id, null) != null
-      }
-    ),
-    var.target_private_dns_zone_name,
-    null
+# --- Private DNS Zone outputs (IDs only) -------------------------------------
+
+# Map: zone_name => zone_id (merged from both DNS zone sources)
+output "private_dns_zone_ids_by_name" {
+  description = "Private DNS Zone IDs keyed by zone name (merged from private_dns_zones and monitor_private_link_scope_dns_zone)."
+  value = merge(
+    { for name, m in module.private_dns_zones :
+        name => try(m.id, m.zone_id, null)
+      if try(m.id, m.zone_id, null) != null
+    },
+    { for name, m in module.monitor_private_link_scope_dns_zone :
+        name => try(m.id, m.zone_id, null)
+      if try(m.id, m.zone_id, null) != null
+    }
   )
+}
+
+# Set of all zone IDs (unordered), useful for passing to other modules
+output "private_dns_zone_ids" {
+  description = "All Private DNS Zone IDs as a set (merged)."
+  value = toset(compact(concat(
+    [for _, m in module.private_dns_zones : try(m.id, m.zone_id, null)],
+    [for _, m in module.monitor_private_link_scope_dns_zone : try(m.id, m.zone_id, null)]
+  )))
+}
+
+# Convenience: when there is exactly one zone in module.private_dns_zones,
+# this returns that single ID. (Errors if not exactly one.)
+output "single_private_dns_zone_id" {
+  description = "ID when exactly one zone is created via module.private_dns_zones."
+  value       = one([for _, m in module.private_dns_zones : try(m.id, m.zone_id)])
+}
+
+# Optional: if you have a single-instance module "private_dns_zone" anywhere,
+# this safely exposes its ID without breaking when it's not present.
+# (If you don't have such a module, you can delete this block.)
+output "private_dns_zone_id" {
+  description = "ID of a single private DNS zone module instance (if you use one)."
+  value       = try(module.private_dns_zone.id, module.private_dns_zone.zone_id, null)
 }
