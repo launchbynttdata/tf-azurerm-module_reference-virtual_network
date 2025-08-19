@@ -103,5 +103,5 @@ output "private_dns_zone_ids" {
 
 output "postgres_private_dns_zone_id" {
   description = "The ID of the Postgres private DNS zone."
-  value       = module.private_dns_zones["privatelink.postgres.database.azure.com"].id
+  value       = contains(keys(module.private_dns_zones), "privatelink.postgres.database.azure.com") ? module.private_dns_zones["privatelink.postgres.database.azure.com"].id : null
 }
