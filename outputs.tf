@@ -88,3 +88,21 @@ output "route_tables_map" {
 output "subnet_route_associations" {
   value = module.network.subnet_route_associations
 }
+
+output "selected_private_dns_zone_id" {
+  description = "ID of the selected Private DNS Zone (or null if not found)."
+  value = var.target_private_dns_zone_name == null ? null : lookup(
+    merge(
+      { for name, m in module.private_dns_zones :
+          name => try(m.id, m.zone_id, null)
+        if try(m.id, m.zone_id, null) != null
+      },
+      { for name, m in module.monitor_private_link_scope_dns_zone :
+          name => try(m.id, m.zone_id, null)
+        if try(m.id, m.zone_id, null) != null
+      }
+    ),
+    var.target_private_dns_zone_name,
+    null
+  )
+}
