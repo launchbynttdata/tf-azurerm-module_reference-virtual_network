@@ -34,6 +34,9 @@ module "network" {
   environment             = var.environment
   environment_number      = var.environment_number
   resource_number         = var.resource_number
+  class_env               = var.class_env
+  instance_env            = var.instance_env
+  instance_resource       = var.instance_resource
   logical_product_family  = var.logical_product_family
   logical_product_service = var.logical_product_service
 
